@@ -1,0 +1,10 @@
+/target
+
+# pixi environments
+.pixi/
+!.pixi/config.toml
+
+# python
+.venv/
+python/**/__pycache__/
+python/**/*.so

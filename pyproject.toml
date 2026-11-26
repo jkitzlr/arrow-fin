@@ -1,0 +1,22 @@
+[build-system]
+requires = ["maturin>=1.7,<2.0"]
+build-backend = "maturin"
+
+[project]
+name = "polars-fin"
+version = "0.0.1"
+requires-python = ">=3.11"
+dependencies = [
+    "polars>=2.2.0",
+]
+
+[tool.maturin]
+manifest-path = "crates/polars-fin/Cargo.toml"
+python-source = "python"
+module-name = "polars_fin._internal"
+
+[dependency-groups]
+dev = [
+    "maturin>=1.16.0",
+    "maturin-import-hook>=0.3.0",
+]

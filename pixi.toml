@@ -1,0 +1,18 @@
+[workspace]
+authors = ["jkitzler <0.chirp.sleeved@icloud.com>"]
+channels = ['conda-forge']
+name = "arrow-finance"
+platforms = ['osx-arm64', 'linux-64', 'linux-aarch64']
+version = "0.1.0"
+
+[tasks]
+maturin-develop = "maturin develop"
+
+[dependencies]
+cargo-nextest = ">=0.9.152,<0.10"
+compilers = ">=2.0.0,<3"
+python = "3.11.*"
+rust = ">=1.100.0,<1.101"
+rust-src = ">=1.100.0,<2"
+rust-analyzer = ">=2026.8.24,<2027"
+uv = ">=0.13.9,<0.14"

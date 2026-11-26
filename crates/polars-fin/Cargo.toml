@@ -1,0 +1,18 @@
+[package]
+name = "polars-fin"
+version.workspace = true
+edition.workspace = true
+
+[lib]
+name = "polars_fin"
+crate-type = ['cdylib', 'rlib']
+
+[dependencies]
+returns = { workspace = true }
+stats = { workspace = true }
+
+arrow = { workspace = true }
+polars = { workspace = true }
+polars-arrow = { workspace = true }
+pyo3 = { workspace = true }
+pyo3-polars = { workspace = true }

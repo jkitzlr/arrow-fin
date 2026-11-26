@@ -1,0 +1,7 @@
+[build]
+# pyo3-polars' PolarsAllocator calls Python::attach on its first allocation.
+# With pyo3's reference pool enabled, that locks a std Mutex which (on macOS)
+# lazily allocates -> re-enters the uninitialised allocator -> infinite
+# recursion / stack overflow at import time. Disabling the pool avoids it.
+# NOTE: dropping a Py<T> while detached from Python will now abort.
+rustflags = ["--cfg", "pyo3_disable_reference_pool"]

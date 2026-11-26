@@ -1,0 +1,11 @@
+[package]
+name = "returns"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+stats = { workspace = true }
+
+arrow = { workspace = true }
+rand = { workspace = true }
+statrs = { workspace = true }
