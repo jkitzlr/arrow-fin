@@ -219,6 +219,7 @@ version = "0.0.1"
 dependencies = [
  "arrow",
  "arrow-fin-stats",
+ "arrow-fin-util",
  "rand",
  "statrs",
 ]
@@ -2263,6 +2264,7 @@ dependencies = [
  "polars-arrow",
  "pyo3",
  "pyo3-polars",
+ "serde",
 ]
 
 [[package]]

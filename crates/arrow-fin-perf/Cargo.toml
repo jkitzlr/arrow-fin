@@ -5,6 +5,7 @@ edition.workspace = true
 
 [dependencies]
 arrow-fin-stats = { workspace = true }
+arrow-fin-util = { workspace = true }
 
 arrow = { workspace = true }
 rand = { workspace = true }

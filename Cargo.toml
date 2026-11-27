@@ -20,3 +20,4 @@ polars-arrow = "0.55.2"
 pyo3 = { version = "0.29", features = ["abi3-py311"]}
 pyo3-polars = { version = "0.28", features = ["derive", "dtype-full"]}
 rand = "0.10.4"
+serde = "1.0.229"

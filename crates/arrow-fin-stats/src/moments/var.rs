@@ -10,7 +10,7 @@ pub struct Variance {
 }
 
 impl Variance {
-    /// Create a new instance from a set of data.
+    /// Create a new instance from a set of data without taking ownership.
     pub fn new(data: &[f64]) -> Self {
         if data.is_empty() {
             return Self::default();
@@ -87,6 +87,22 @@ impl Variance {
     }
 }
 
+impl FromIterator<f64> for Variance {
+    fn from_iter<I: IntoIterator<Item = f64>>(iter: I) -> Self {
+        let mut sum: f64 = 0.0;
+        let mut sum2: f64 = 0.0;
+        let mut count: usize = 0;
+
+        for x in iter {
+            sum += x;
+            sum2 += x.powi(2);
+            count += 1;
+        }
+
+        Self { sum, sum2, count }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use arrow::array::PrimitiveArray;
@@ -116,5 +132,13 @@ mod tests {
     fn result() {
         let var = Variance::new(RAW_DATA);
         assert_eq!(var.result(1).unwrap(), 7.5);
+    }
+
+    #[test]
+    fn from_iter_f64() {
+        let var = Variance::from_iter(RAW_DATA.to_vec());
+        assert_eq!(var.sum, 45.0);
+        assert_eq!(var.sum2, 285.0);
+        assert_eq!(var.count, RAW_DATA.len());
     }
 }

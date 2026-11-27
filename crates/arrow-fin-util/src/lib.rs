@@ -1,6 +1,7 @@
 use arrow::array::*;
 use arrow::compute::kernels::cast;
-use arrow::datatypes::DataType;
+use arrow::datatypes::*;
+use arrow::error::ArrowError;
 
 pub type ArrowResult<T> = arrow::error::Result<T>;
 
@@ -51,5 +52,95 @@ impl<T: ArrowNumericType> ArrowNumericExt for &PrimitiveArray<T> {
     fn f64(&self) -> ArrowResult<Float64Array> {
         let data_f64 = cast(self, &DataType::Float64)?;
         Ok(data_f64.as_primitive().clone())
+    }
+}
+
+impl ArrowNumericExt for ArrayRef {
+    fn f64(&self) -> ArrowResult<Float64Array> {
+        use DataType::*;
+
+        // TODO: is the clone necessary?
+        // TODO: implement macro for the arms
+        match self.data_type().clone() {
+            Int8 => self
+                .as_primitive_opt::<Int8Type>()
+                .ok_or_else(|| {
+                    ArrowError::CastError("unable to convert to numeric type.".to_owned())
+                })?
+                .f64(),
+            Int16 => self
+                .as_primitive_opt::<Int16Type>()
+                .ok_or_else(|| {
+                    ArrowError::CastError("unable to convert to numeric type.".to_owned())
+                })?
+                .f64(),
+            Int32 => self
+                .as_primitive_opt::<Int32Type>()
+                .ok_or_else(|| {
+                    ArrowError::CastError("unable to convert to numeric type.".to_owned())
+                })?
+                .f64(),
+            Int64 => self
+                .as_primitive_opt::<Int64Type>()
+                .ok_or_else(|| {
+                    ArrowError::CastError("unable to convert to numeric type.".to_owned())
+                })?
+                .f64(),
+            Float64 => self
+                .as_primitive_opt::<Float64Type>()
+                .ok_or_else(|| {
+                    ArrowError::CastError("unable to convert to numeric type.".to_owned())
+                })?
+                .f64(),
+            datatype => Err(ArrowError::InvalidArgumentError(format!(
+                "unsupported input data type {}!",
+                datatype
+            ))),
+        }
+    }
+}
+
+impl ArrowNumericExt for &dyn Array {
+    fn f64(&self) -> ArrowResult<Float64Array> {
+        use DataType::*;
+
+        // TODO: is the clone necessary?
+        // TODO: implement macro for the arms
+        match self.data_type().clone() {
+            Int8 => self
+                .as_primitive_opt::<Int8Type>()
+                .ok_or_else(|| {
+                    ArrowError::CastError("unable to convert to numeric type.".to_owned())
+                })?
+                .f64(),
+            Int16 => self
+                .as_primitive_opt::<Int16Type>()
+                .ok_or_else(|| {
+                    ArrowError::CastError("unable to convert to numeric type.".to_owned())
+                })?
+                .f64(),
+            Int32 => self
+                .as_primitive_opt::<Int32Type>()
+                .ok_or_else(|| {
+                    ArrowError::CastError("unable to convert to numeric type.".to_owned())
+                })?
+                .f64(),
+            Int64 => self
+                .as_primitive_opt::<Int64Type>()
+                .ok_or_else(|| {
+                    ArrowError::CastError("unable to convert to numeric type.".to_owned())
+                })?
+                .f64(),
+            Float64 => self
+                .as_primitive_opt::<Float64Type>()
+                .ok_or_else(|| {
+                    ArrowError::CastError("unable to convert to numeric type.".to_owned())
+                })?
+                .f64(),
+            datatype => Err(ArrowError::InvalidArgumentError(format!(
+                "unsupported input data type {}!",
+                datatype
+            ))),
+        }
     }
 }

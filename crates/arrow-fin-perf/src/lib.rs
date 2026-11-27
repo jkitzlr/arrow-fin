@@ -1,32 +1,118 @@
 use std::str::FromStr;
 
-use arrow::array::{ArrayRef, AsArray, Datum};
+use arrow::array::{ArrayRef, Datum};
 use arrow::compute::kernels::numeric::sub_wrapping;
-use arrow::datatypes::Float64Type;
-use arrow::error::ArrowError::ComputeError;
 use arrow::error::Result as ArrowResult;
-use arrow_fin_stats::{mean, stdev};
+
+pub use sharpe::Sharpe;
+
+mod sharpe;
+
+// TODO: move this to a generic finance functionality crate
+// TODO: implement a Period (CompoundingPeriod?) counterpart struct
+// TODO: do I need daily? or just let consumers implement own logic on Daily; technically this already wrong, e.g., equity vs fi
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum Frequency {
+    Annual,
+    SemiAnnual,
+    Quarterly,
+    Monthly,
+    Weekly,
+    Daily,
+    BusDays,
+}
+
+impl Frequency {
+    /// Tests whether the frequency is meaasured in months (i.e. fixed per year)
+    pub fn is_monthly(&self) -> bool {
+        use Frequency::*;
+
+        matches!(*self, Annual | SemiAnnual | Quarterly | Monthly)
+    }
+
+    /// Get the number of instances of the period in a year.
+    pub fn numeric(&self) -> u32 {
+        use Frequency::*;
+
+        match *self {
+            Annual => 1,
+            SemiAnnual => 2,
+            Quarterly => 4,
+            Monthly => 12,
+            Weekly => 52,
+            Daily => 356,
+            BusDays => 252,
+        }
+    }
+
+    /// Calculate the mulitplier to convert `self` to `other` Frequency.
+    ///
+    /// ## Examples
+    ///
+    /// ```rust
+    /// let src = Frequency::SemiAnnual;
+    /// let tgt = Frequency::Quarterly;
+    /// assert_eq!(src.muliptlier(tgt), 2.0);
+    /// ```
+    pub fn multiplier(&self, other: &Self) -> f64 {
+        (self.numeric() as f64) / (other.numeric() as f64)
+    }
+}
+
+impl FromStr for Frequency {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        use Frequency::*;
+
+        match s.to_lowercase().as_str() {
+            "annual" => Ok(Annual),
+            "semiannual" => Ok(SemiAnnual),
+            "quarterly" => Ok(Quarterly),
+            "monthly" => Ok(Monthly),
+            "weekly" => Ok(Weekly),
+            "daily" => Ok(Daily),
+            "busdays" => Ok(BusDays),
+            _ => Err(format!("Unsupported frequency {s}.")),
+        }
+    }
+}
+
+macro_rules! freq_try_from_int {
+    ($src:ty) => {
+        impl TryFrom<$src> for Frequency {
+            type Error = String;
+
+            fn try_from(value: $src) -> Result<Self, Self::Error> {
+                use Frequency::*;
+
+                match value {
+                    1 => Ok(Annual),
+                    2 => Ok(SemiAnnual),
+                    4 => Ok(Quarterly),
+                    12 => Ok(Monthly),
+                    52 => Ok(Weekly),
+                    365 => Ok(Daily),
+                    252 => Ok(BusDays),
+                    _ => Err(format!("Unrecognized frequency {value}")),
+                }
+            }
+        }
+    };
+}
+
+freq_try_from_int!(u16);
+freq_try_from_int!(u32);
+freq_try_from_int!(u64);
+freq_try_from_int!(i16);
+freq_try_from_int!(i32);
+freq_try_from_int!(i64);
 
 /// Calculate the excess return of a total return series over bmk returns.
 ///
 /// The total and benchmark returns are assumed to be effective rates over consistent periods.
 pub fn execess_return(rtn: &dyn Datum, bmk: &dyn Datum) -> ArrowResult<ArrayRef> {
     sub_wrapping(rtn, bmk)
-}
-
-// TODO: need to handle compounding frequency logic
-pub fn sharpe(rtn: &dyn Datum, cash_rate: &dyn Datum) -> ArrowResult<f64> {
-    let xs = execess_return(rtn, cash_rate)?;
-    let xs = xs.as_primitive::<Float64Type>();
-
-    let mean = mean(xs).ok_or_else(|| {
-        ComputeError(String::from_str("Unable to compute the mean excess return.").unwrap())
-    })?;
-    let vol = stdev(xs, 1).ok_or_else(|| {
-        ComputeError(String::from_str("Unable to compute the excess return vol.").unwrap())
-    })?;
-
-    Ok(mean / vol)
 }
 
 #[cfg(test)]
@@ -38,7 +124,7 @@ mod tests {
     use rand::rngs::StdRng;
     use statrs::distribution::Normal;
 
-    use super::{execess_return, sharpe};
+    use super::execess_return;
 
     fn asset_returns() -> Vec<f64> {
         let mut rng = StdRng::seed_from_u64(0);
@@ -82,18 +168,5 @@ mod tests {
         let rslt = rslt.as_primitive::<Float64Type>().values().to_vec();
 
         assert_eq!(rslt, expected);
-    }
-
-    #[test]
-    fn sharpe_ratio() {
-        let returns = Float64Array::from(vec![
-            20e-4, -40e-4, 50e-4, -10e-4, 30e-4, -20e-4, 40e-4, 10e-4, -30e-4, 20e-4,
-        ]);
-        let cash_rate = Float64Array::new_scalar(4e-2 / 252.0);
-
-        let rslt = sharpe(&returns, &cash_rate).unwrap();
-        let expected = 0.17706677867281076;
-
-        assert!((rslt - expected).abs() < 1e-8)
     }
 }
