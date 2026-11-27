@@ -5,7 +5,7 @@ use arrow::compute::kernels::numeric::sub_wrapping;
 use arrow::datatypes::Float64Type;
 use arrow::error::ArrowError::ComputeError;
 use arrow::error::Result as ArrowResult;
-use arrow_fin_stats::PrimitiveArrayExt;
+use arrow_fin_stats::{mean, stdev};
 
 /// Calculate the excess return of a total return series over bmk returns.
 ///
@@ -19,10 +19,10 @@ pub fn sharpe(rtn: &dyn Datum, cash_rate: &dyn Datum) -> ArrowResult<f64> {
     let xs = execess_return(rtn, cash_rate)?;
     let xs = xs.as_primitive::<Float64Type>();
 
-    let mean = xs.calc_mean().ok_or_else(|| {
+    let mean = mean(xs).ok_or_else(|| {
         ComputeError(String::from_str("Unable to compute the mean excess return.").unwrap())
     })?;
-    let vol = xs.calc_stdev(1).ok_or_else(|| {
+    let vol = stdev(xs, 1).ok_or_else(|| {
         ComputeError(String::from_str("Unable to compute the excess return vol.").unwrap())
     })?;
 

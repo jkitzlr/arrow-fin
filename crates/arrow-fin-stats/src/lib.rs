@@ -1,78 +1,30 @@
-use arrow::array::{Array, ArrowNumericType, AsArray, Float64Array, PrimitiveArray};
-use arrow::compute::{cast, sum};
-use arrow::datatypes::DataType;
+use arrow::array::*;
 
-pub use var::Variance;
+use moments::Moments;
 
-mod var;
+pub mod moments;
 
-// TODO: seal this extension trait
-// TODO: move this into a separate utils crate
-/// Extension trait to provide automatic upcasting for numeric arrays
-pub trait PrimitiveArrayExt {
-    // TODO: return Result?
-    fn f64(&self) -> Option<Float64Array>;
-
-    // TODO: implement the struct
-    // fn mean(&self) -> Option<ArithmeticMean>;
-
-    fn variance(&self) -> Option<Variance>;
-
-    fn calc_mean(&self) -> Option<f64>;
-
-    fn calc_variance(&self, ddof: u8) -> Option<f64> {
-        let var = self.variance()?;
-        var.result(ddof)
-    }
-
-    fn calc_stdev(&self, ddof: u8) -> Option<f64> {
-        self.calc_variance(ddof).map(|v| v.sqrt())
-    }
-}
-
-impl<T: ArrowNumericType> PrimitiveArrayExt for PrimitiveArray<T> {
-    fn f64(&self) -> Option<Float64Array> {
-        let data_f64 = cast(self, &DataType::Float64).ok()?;
-        Some(data_f64.as_primitive().clone())
-    }
-
-    fn calc_mean(&self) -> Option<f64> {
-        if self.is_empty() || self.len() == self.null_count() {
-            return None;
-        }
-
-        let data = self.f64()?;
-
-        let total = sum(&data)?;
-        let count = data.len() - data.null_count();
-
-        Some(total / count as f64)
-    }
-
-    fn variance(&self) -> Option<Variance> {
-        Variance::from_array(self)
-    }
-}
+// TODO: are these functions really needed...?
 
 pub fn mean<T>(data: &PrimitiveArray<T>) -> Option<f64>
 where
     T: ArrowNumericType,
 {
-    data.calc_mean()
+    data.mean().and_then(|mean| mean.result())
 }
 
-pub fn variance<T>(data: &PrimitiveArray<T>, ddof: u8) -> Option<f64>
+pub fn variance<T>(data: &PrimitiveArray<T>, ddof: usize) -> Option<f64>
 where
     T: ArrowNumericType,
 {
-    data.calc_variance(ddof)
+    data.variance().and_then(|mean| mean.result(ddof))
 }
 
-pub fn stdev<T>(data: &PrimitiveArray<T>, ddof: u8) -> Option<f64>
+pub fn stdev<T>(data: &PrimitiveArray<T>, ddof: usize) -> Option<f64>
 where
     T: ArrowNumericType,
 {
-    data.calc_stdev(ddof)
+    data.variance().and_then(|mean| mean.std(ddof))
 }
 
 // TODO: generate test for all numeric types using a macro

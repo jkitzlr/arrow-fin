@@ -11,6 +11,7 @@ edition = "2024"
 [workspace.dependencies]
 arrow-fin-perf = { path = "crates/arrow-fin-perf" }
 arrow-fin-stats = { path = "crates/arrow-fin-stats" }
+arrow-fin-util = { path = "crates/arrow-fin-util" }
 
 arrow = { version = "60.2.0", features = ["ffi"] }
 statrs = "0.19.1"

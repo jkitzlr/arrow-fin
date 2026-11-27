@@ -4,4 +4,6 @@ version.workspace = true
 edition.workspace = true
 
 [dependencies]
+arrow-fin-util = { workspace = true }
+
 arrow = { workspace = true }

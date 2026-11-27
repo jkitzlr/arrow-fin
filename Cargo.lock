@@ -228,6 +228,14 @@ name = "arrow-fin-stats"
 version = "0.0.1"
 dependencies = [
  "arrow",
+ "arrow-fin-util",
+]
+
+[[package]]
+name = "arrow-fin-util"
+version = "0.0.1"
+dependencies = [
+ "arrow",
 ]
 
 [[package]]
