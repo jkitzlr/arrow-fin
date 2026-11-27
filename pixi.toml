@@ -7,6 +7,7 @@ version = "0.1.0"
 
 [tasks]
 maturin-develop = "maturin develop"
+doctest = "uv run pytest --doctest-modules"
 
 [dependencies]
 cargo-nextest = ">=0.9.152,<0.10"

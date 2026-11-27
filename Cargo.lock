@@ -2229,7 +2229,7 @@ dependencies = [
 
 [[package]]
 name = "polars-fin"
-version = "0.1.0"
+version = "0.0.1"
 dependencies = [
  "arrow",
  "polars",
@@ -3062,7 +3062,7 @@ dependencies = [
 
 [[package]]
 name = "returns"
-version = "0.1.0"
+version = "0.0.1"
 dependencies = [
  "arrow",
  "rand",
@@ -3507,7 +3507,7 @@ dependencies = [
 
 [[package]]
 name = "stats"
-version = "0.1.0"
+version = "0.0.1"
 dependencies = [
  "arrow",
 ]
