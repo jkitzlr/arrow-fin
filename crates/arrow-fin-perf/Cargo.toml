@@ -1,10 +1,10 @@
 [package]
-name = "returns"
+name = "arrow-fin-perf"
 version.workspace = true
 edition.workspace = true
 
 [dependencies]
-stats = { workspace = true }
+arrow-fin-stats = { workspace = true }
 
 arrow = { workspace = true }
 rand = { workspace = true }

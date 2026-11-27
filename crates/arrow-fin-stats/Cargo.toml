@@ -1,5 +1,5 @@
 [package]
-name = "stats"
+name = "arrow-fin-stats"
 version.workspace = true
 edition.workspace = true
 

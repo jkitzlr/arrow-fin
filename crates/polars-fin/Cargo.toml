@@ -8,8 +8,8 @@ name = "polars_fin"
 crate-type = ['cdylib', 'rlib']
 
 [dependencies]
-returns = { workspace = true }
-stats = { workspace = true }
+arrow-fin-perf = { workspace = true }
+arrow-fin-stats = { workspace = true }
 
 arrow = { workspace = true }
 polars = { workspace = true }

@@ -5,7 +5,7 @@ use arrow::compute::kernels::numeric::sub_wrapping;
 use arrow::datatypes::Float64Type;
 use arrow::error::ArrowError::ComputeError;
 use arrow::error::Result as ArrowResult;
-use stats::PrimitiveArrayExt;
+use arrow_fin_stats::PrimitiveArrayExt;
 
 /// Calculate the excess return of a total return series over bmk returns.
 ///

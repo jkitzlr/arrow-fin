@@ -1,3 +1,4 @@
+use arrow_fin_perf as perf;
 use polars::prelude::*;
 use pyo3_polars::derive::polars_expr;
 
@@ -16,7 +17,7 @@ fn sharpe(inputs: &[Series]) -> PolarsResult<Series> {
         .to_arrow(0, CompatLevel::newest())
         .into();
 
-    let sharpe = returns::sharpe(&rtn.0, &bmk.0)
+    let sharpe = perf::sharpe(&rtn.0, &bmk.0)
         .map_err(|_| polars_err!(ComputeError: "Unable to compute Sharpe ratio."))?;
 
     Ok(Series::new(PlSmallStr::EMPTY, &[sharpe]))

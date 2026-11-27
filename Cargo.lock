@@ -214,6 +214,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "arrow-fin-perf"
+version = "0.0.1"
+dependencies = [
+ "arrow",
+ "arrow-fin-stats",
+ "rand",
+ "statrs",
+]
+
+[[package]]
+name = "arrow-fin-stats"
+version = "0.0.1"
+dependencies = [
+ "arrow",
+]
+
+[[package]]
 name = "arrow-ipc"
 version = "60.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2232,12 +2249,12 @@ name = "polars-fin"
 version = "0.0.1"
 dependencies = [
  "arrow",
+ "arrow-fin-perf",
+ "arrow-fin-stats",
  "polars",
  "polars-arrow",
  "pyo3",
  "pyo3-polars",
- "returns",
- "stats",
 ]
 
 [[package]]
@@ -3061,16 +3078,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "returns"
-version = "0.0.1"
-dependencies = [
- "arrow",
- "rand",
- "statrs",
- "stats",
-]
-
-[[package]]
 name = "ring"
 version = "0.17.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3503,13 +3510,6 @@ dependencies = [
  "num-traits",
  "rand",
  "thiserror",
-]
-
-[[package]]
-name = "stats"
-version = "0.0.1"
-dependencies = [
- "arrow",
 ]
 
 [[package]]
